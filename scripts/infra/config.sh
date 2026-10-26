@@ -4,7 +4,7 @@
 # Edite SOMENTE este arquivo (RM e regiao). Nenhuma senha fica aqui.
 # =====================================================================
 
-export RM="557481"                 # RM do aluno (usado nos nomes dos recursos)
+export RM="557410"                 # RM do aluno (usado nos nomes dos recursos)
 export LOCATION="eastus2"          # Rode 00-testar-regioes.sh se essa regiao for bloqueada
 
 export RG="rg-dimdim-cp3-${RM}"

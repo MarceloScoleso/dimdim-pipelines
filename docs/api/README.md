@@ -22,7 +22,7 @@ Base: `https://dimdim-api-<RM>.azurewebsites.net`
 ## Mesmo CRUD com curl (Git Bash, a partir da raiz do repo)
 
 ```bash
-URL=https://dimdim-api-557481.azurewebsites.net
+URL=https://dimdim-api-557410.azurewebsites.net
 H="Content-Type: application/json"
 
 curl -s $URL/
