@@ -1,0 +1,66 @@
+# =====================================================================
+# DimDim API - Pipeline de BUILD (CI)
+# 3o Checkpoint 2o Semestre - DevOps Tools & Cloud Computing (FIAP)
+#
+# Dispara automaticamente a cada commit/merge na main.
+# Compila, roda os testes JUnit, publica o resultado dos testes e
+# publica o pacote (dimdim.jar) como artefato "drop" para a Release (CD).
+# =====================================================================
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr: none
+
+parameters:
+  # Deixe false se a organizacao tiver paralelismo hospedado pela Microsoft.
+  # Mude para true se for usar um agente self-hosted (pool Default).
+  - name: usarAgenteSelfHosted
+    displayName: Usar agente self-hosted (pool Default)?
+    type: boolean
+    default: false
+
+pool:
+  ${{ if eq(parameters.usarAgenteSelfHosted, true) }}:
+    name: Default
+  ${{ else }}:
+    vmImage: ubuntu-latest
+
+variables:
+  mavenPom: pom.xml
+
+stages:
+  - stage: Build
+    displayName: Build e Testes
+    jobs:
+      - job: BuildJava
+        displayName: Maven build + JUnit
+        steps:
+          - task: Maven@4
+            displayName: Compilar, testar e empacotar (mvn clean package)
+            inputs:
+              mavenPomFile: $(mavenPom)
+              goals: clean package
+              options: -B
+              javaHomeOption: JDKVersion
+              jdkVersionOption: '1.17'
+              mavenVersionOption: Default
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              testRunTitle: DimDim - Testes JUnit
+
+          - task: CopyFiles@2
+            displayName: Copiar dimdim.jar para a area de staging
+            inputs:
+              SourceFolder: $(System.DefaultWorkingDirectory)/target
+              Contents: dimdim.jar
+              TargetFolder: $(Build.ArtifactStagingDirectory)
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publicar artefato drop
+            inputs:
+              PathtoPublish: $(Build.ArtifactStagingDirectory)
+              ArtifactName: drop
+              publishLocation: Container
